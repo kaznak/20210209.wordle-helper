@@ -1,0 +1,27 @@
+#!/bin/bash
+
+pname="$(basename $0)"
+based="$(dirname $0)"/..
+stime="$(date +%Y%m%d%H%M%S)"
+
+tmpd=/tmp/"$pname"."$stime"."$$"
+
+mkdir -p "$tmpd"
+
+#####################################################
+
+mkfifo "$tmpd"/{lines,include,pos}
+
+wc -l "$tmpd"/lines | awk '{ print $1 }'    > "$tmpd"/lines.out &
+"$based"/bin/letter-include-stat < "$tmpd"/include  > "$tmpd"/include.out   &
+"$based"/bin/letter-pos-stat < "$tmpd"/pos  > "$tmpd"/pos.out   &
+
+tee "$tmpd"/{lines,include,pos} > /dev/null
+
+wait
+
+cat "$tmpd"/{lines,include,pos}.out
+
+#####################################################
+rm -rf "$tmpd"
+exit 0

@@ -22,7 +22,13 @@ awk '
     }
 }
 END{ print NR }
-'   > "$tmpd"/count
+'   |
+tee "$tmpd"/count   |
+grep '^0$'  > "$tmpd"/no-words
+
+if [ -s "$tmpd"/no-words ] ; then
+    exit 0
+fi
 
 for i in {1..5} ; do
     sort "$tmpd"/letter."$i"    |

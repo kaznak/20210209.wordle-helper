@@ -18,7 +18,14 @@ for c in {a..z} ; do
 done
 
 tee "$tmpd"/include.{a..z}  |
-wc -l   > "$tmpd"/count
+wc -l   |
+awk '{ print $1 }'  |
+tee "$tmpd"/count   |
+grep '^0$'  > "$tmpd"/no-words
+
+if [ -s "$tmpd"/no-words ] ; then
+    exit 0
+fi
 
 for c in {a..z} ; do
     awk '{ printf("%05f '"$c"'\n", $1/'"$(cat "$tmpd"/count)"' )}' "$tmpd"/include-count."$c"

@@ -1,5 +1,7 @@
 # wordle helper
 
+[wordle](https://www.powerlanguage.co.uk/wordle/) helper
+
 ## usage
 
 ```

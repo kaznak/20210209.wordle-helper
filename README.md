@@ -20,3 +20,8 @@ c 0 r 0 o 0 n 0 y 0
 0.25000 v 0.25000 h 0.25000 i 0.25000 f 0.25000 f
 0.25000 w 0.25000 i 0.25000 v 0.25000 p 0.25000 h
 ```
+
+## reference
+
+- [the site](https://freshman.dev/wordle)
+- [the answer](https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b)

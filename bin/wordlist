@@ -10,8 +10,14 @@ mkdir -p "$tmpd"
 
 #####################################################
 
-echo $* |
+echo -n $* |
 tr 'A-Z' 'a-z' > "$tmpd"/stat
+
+if [ ! -s "$tmpd"/stat ] ; then
+    cat "$based"/data/wordle-answers-alphabetical.txt
+    rm -rf "$tmpd"
+    exit 0
+fi
 
 xargs -n10  < "$tmpd"/stat  >&2
 

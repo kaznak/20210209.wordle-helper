@@ -32,7 +32,8 @@ for i in {1..5} ; do
     awk '1;END{ for(i=NR;i<26;i++) {print "         "}}'    > "$tmpd"/letter-count."$i"
 done
 
-paste -d" " "$tmpd"/letter-count.{1..5}
+paste -d" " "$tmpd"/letter-count.{1..5} |
+grep -v '^[[:space:]]*$'
 
 #####################################################
 rm -rf "$tmpd"

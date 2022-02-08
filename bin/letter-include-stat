@@ -1,0 +1,30 @@
+#!/bin/bash
+
+pname="$(basename $0)"
+based="$(dirname $0)"/..
+stime="$(date +%Y%m%d%H%M%S)"
+
+tmpd=/tmp/"$pname"."$stime"."$$"
+
+mkdir -p "$tmpd"
+
+#####################################################
+
+mkfifo "$tmpd"/include.{a..z}
+
+for c in {a..z} ; do
+    grep $c "$tmpd"/include."$c"    |
+    wc -l   > "$tmpd"/include-count."$c"    &
+done
+
+tee "$tmpd"/include.{a..z}  |
+wc -l   > "$tmpd"/count
+
+for c in {a..z} ; do
+    awk '{ printf("%05f '"$c"'\n", $1/'"$(cat "$tmpd"/count)"' )}' "$tmpd"/include-count."$c"
+done    |
+sort -k1nr
+
+#####################################################
+rm -rf "$tmpd"
+exit 0

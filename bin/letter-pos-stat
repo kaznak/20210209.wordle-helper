@@ -1,0 +1,39 @@
+#!/bin/bash
+
+pname="$(basename $0)"
+based="$(dirname $0)"/..
+stime="$(date +%Y%m%d%H%M%S)"
+
+tmpd=/tmp/"$pname"."$stime"."$$"
+
+mkdir -p "$tmpd"
+
+
+
+#####################################################
+
+
+
+awk '
+{
+    for(i=1;i<6;i++) {
+        file = "'"$tmpd"'/letter."i
+        print substr($0,i,1)    > file;
+    }
+}
+END{ print NR }
+'   > "$tmpd"/count
+
+for i in {1..5} ; do
+    sort "$tmpd"/letter."$i"    |
+    uniq -c |
+    awk '{ printf("%.05f %s\n", $1/'"$(cat "$tmpd"/count)"', $2) }'  |
+    sort -k1nr  |
+    awk '1;END{ for(i=NR;i<26;i++) {print "         "}}'    > "$tmpd"/letter-count."$i"
+done
+
+paste -d" " "$tmpd"/letter-count.{1..5}
+
+#####################################################
+rm -rf "$tmpd"
+exit 0

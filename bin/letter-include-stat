@@ -23,6 +23,7 @@ wc -l   > "$tmpd"/count
 for c in {a..z} ; do
     awk '{ printf("%05f '"$c"'\n", $1/'"$(cat "$tmpd"/count)"' )}' "$tmpd"/include-count."$c"
 done    |
+awk '0!=$1' |
 sort -k1nr
 
 #####################################################

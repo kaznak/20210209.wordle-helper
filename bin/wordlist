@@ -34,7 +34,7 @@ awk '{ print "grep", $1, "|" }END{ print "cat" }' > "$tmpd"/included.sh
 
 xargs -n10 < "$tmpd"/stat   |
 awk '{
-    for(i=1;i<5;i++) {
+    for(i=1;i<6;i++) {
         if(1==$(2*i)) {
             file = "'"$tmpd"'/not-in."i
             print $(2*i-1)  > file
@@ -47,7 +47,7 @@ awk '{
 
 for i in {1..5} ; do
     if [ -s "$tmpd"/in."$i" ] ; then
-        echo "$(cat "$tmpd"/in."$i")"
+        echo "$(uniq "$tmpd"/in."$i")"
     elif [ -s "$tmpd"/not-in."$i" ] ; then
         echo "[^$(sort -u "$tmpd"/not-in."$i"|tr -d '\n')]"
     else

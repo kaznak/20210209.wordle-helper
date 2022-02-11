@@ -1,5 +1,5 @@
 [package]
-name = "kaznak-wordle-helper"
+name = "wordle_helper"
 version = "0.1.0"
 edition = "2021"
 

@@ -25,7 +25,6 @@ fi
 # parse
 xargs -n10  < "$tmpd"/stat  >&2
 
-# position
 xargs -n10 < "$tmpd"/stat   |
 awk '{
     for(i=1;i<6;i++) {
@@ -42,6 +41,7 @@ awk '{
     }
 }'
 
+# position
 for i in {1..5} ; do
     if [ -s "$tmpd"/in."$i" ] ; then
         echo "$(uniq "$tmpd"/in."$i")"
@@ -68,11 +68,13 @@ tr -d '\n'  |
 xargs -I% echo '^[^%]{5}$'    |
 tee -a "$tmpd"/and.pattern  >&3
 
+# generate narrowing script
 awk '{ print "grep -E", $1, "|" }END{ print "cat" }' "$tmpd"/and.pattern   |
 tee "$tmpd"/narrowing.sh    >&3
 
 { head "$tmpd"/*; echo; }   >&3
 
+# do narrowing
 cat "$based"/data/wordle-answers-alphabetical.txt   |
 bash "$tmpd"/narrowing.sh
 

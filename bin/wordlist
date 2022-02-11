@@ -8,8 +8,8 @@ tmpd=/tmp/"$pname"."$stime"."$$"
 
 mkdir -p "$tmpd"
 
-# exec 3>/dev/null
-exec 3>&2
+exec 3>/dev/null
+# exec 3>&2
 
 #####################################################
 

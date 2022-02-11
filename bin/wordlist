@@ -8,6 +8,9 @@ tmpd=/tmp/"$pname"."$stime"."$$"
 
 mkdir -p "$tmpd"
 
+# exec 3>/dev/null
+exec 3>&2
+
 #####################################################
 
 echo -n $* |
@@ -19,23 +22,17 @@ if [ ! -s "$tmpd"/stat ] ; then
     exit 0
 fi
 
+# parse
 xargs -n10  < "$tmpd"/stat  >&2
 
-xargs -n2  < "$tmpd"/stat   |
-awk '$2==0{print $1}'   |
-sort -u |
-tr -d '\n'  > "$tmpd"/not-included
-
-xargs -n2  < "$tmpd"/stat   |
-awk '$2==1{print $1}'   |
-sort -u |
-awk '{ print "grep", $1, "|" }END{ print "cat" }' > "$tmpd"/included.sh
-
-
+# position
 xargs -n10 < "$tmpd"/stat   |
 awk '{
     for(i=1;i<6;i++) {
-        if(1==$(2*i)) {
+        if(0==$(2*1)) {
+            file = "'"$tmpd"'/not-included"
+            print $(2*i-1)  > file
+        } else if(1==$(2*i)) {
             file = "'"$tmpd"'/not-in."i
             print $(2*i-1)  > file
         } else if (2==$(2*i)) {
@@ -55,14 +52,27 @@ for i in {1..5} ; do
     fi
 done    |
 tr -d '\n'  |
-awk '{ print "^"$0"$" }'    > "$tmpd"/pattern
+awk '{ print "^"$0"$" }'    |
+tee -a "$tmpd"/and.pattern  >&3
+
+# included
+cat "$tmpd"/{,not-}in.* |
+sort -u |
+tee "$tmpd"/included    |
+tee -a "$tmpd"/and.pattern  >&3
+
+# not included
+sort -u "$tmpd"/not-included    |
+grep -vf "$tmpd"/included   |
+tr -d '\n'  |
+xargs -I% echo '^[^%]{5}$'    |
+tee -a "$tmpd"/and.pattern  >&3
+
+awk '{ print "grep -E", $1, "|" }END{ print "cat" }' "$tmpd"/and.pattern   |
+tee "$tmpd"/narrowing.sh    >&3
 
 cat "$based"/data/wordle-answers-alphabetical.txt   |
-grep -E '^[^'$(cat "$tmpd"/not-included)']{5}$' |
-bash "$tmpd"/included.sh    |
-grep "$(tr -d '\n' < "$tmpd"/pattern)" |
-cat
-
+bash "$tmpd"/narrowing.sh
 
 #####################################################
 rm -rf "$tmpd"

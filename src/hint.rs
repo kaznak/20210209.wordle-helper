@@ -11,8 +11,8 @@ impl DigitHint {
     pub fn is_valid(&self) -> bool {
         match self {
             DigitHint::NotIncluded(_) => true,
-            DigitHint::NotHere(i, c) => *i < config::WORD_LENGTH && c.is_ascii_lowercase(),
-            DigitHint::Here(i, c) => *i < config::WORD_LENGTH && c.is_ascii_lowercase(),
+            DigitHint::NotHere(i, c) => *i < config::WORD_LENGTH && config::check_alphabet(c),
+            DigitHint::Here(i, c) => *i < config::WORD_LENGTH && config::check_alphabet(c),
         }
     }
 }

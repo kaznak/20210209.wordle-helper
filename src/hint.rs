@@ -11,18 +11,24 @@ impl DigitHint {
     pub fn is_valid(&self) -> bool {
         match self {
             DigitHint::NotIncluded(_) => true,
-            DigitHint::NotHere(i, _) => *i < config::WORD_LENGTH,
-            DigitHint::Here(i, _) => *i < config::WORD_LENGTH,
+            DigitHint::NotHere(i, c) => *i < config::WORD_LENGTH && c.is_ascii_lowercase(),
+            DigitHint::Here(i, c) => *i < config::WORD_LENGTH && c.is_ascii_lowercase(),
         }
     }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct TryHint([DigitHint; config::WORD_LENGTH]);
+pub struct TryHint {
+    hint: [DigitHint; config::WORD_LENGTH],
+}
 
 impl TryHint {
-    pub fn from_slice(args: &[String]) -> Vec<TryHint> {
-        args.chunks_exact(2 * config::WORD_LENGTH)
+    pub fn is_valid(&self) -> bool {
+        self.hint.iter().all(DigitHint::is_valid)
+    }
+    pub fn from_slice(args: &[String]) -> Option<Vec<TryHint>> {
+        let tryhint: Vec<TryHint> = args
+            .chunks_exact(2 * config::WORD_LENGTH)
             .map(|onetry| {
                 let mut hint = [DigitHint::NotIncluded('\0'); config::WORD_LENGTH];
                 onetry.chunks(2).enumerate().for_each(|(pos, arg)| {
@@ -38,8 +44,13 @@ impl TryHint {
                         _ => panic!("bad hint digit: {:?}", hint_digit_char),
                     }
                 });
-                TryHint(hint)
+                TryHint { hint }
             })
-            .collect()
+            .collect();
+        if tryhint.iter().all(TryHint::is_valid) {
+            Some(tryhint)
+        } else {
+            None
+        }
     }
 }

@@ -43,6 +43,7 @@ awk '{
 
 # position
 for i in {1..5} ; do
+    touch "$tmpd"/{,not-}in."$i"
     if [ -s "$tmpd"/in."$i" ] ; then
         echo "$(uniq "$tmpd"/in."$i")"
     elif [ -s "$tmpd"/not-in."$i" ] ; then
@@ -63,7 +64,11 @@ tee -a "$tmpd"/and.pattern  >&3
 
 # not included
 sort -u "$tmpd"/not-included    |
-grep -vf "$tmpd"/included   |
+if [ -s "$tmpd"/included ] ; then
+    grep -vf "$tmpd"/included
+else
+    cat
+fi  |
 tr -d '\n'  |
 xargs -I% echo '^[^%]{5}$'    |
 tee -a "$tmpd"/and.pattern  >&3

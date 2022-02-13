@@ -1,0 +1,33 @@
+#!/bin/bash
+
+pname="$(basename $0)"
+based="$(dirname $0)"/..
+stime="$(date +%Y%m%d%H%M%S)"
+
+tmpd=/tmp/"$pname"."$stime"."$$"
+
+mkdir -p "$tmpd"
+
+#####################################################
+
+gawk -v FS="" '{
+    for(i=1;i<=NF;i++) {
+        if(1 == c[$i]) {
+            for(k in c) {
+                c[k] = 0
+            }
+            next;
+        } else {
+            c[$i] += 1
+        }
+    }
+    for(k in c) {
+        c[k] = 0
+    }
+    print
+}'  |
+cat
+
+#####################################################
+rm -rf "$tmpd"
+exit 0
